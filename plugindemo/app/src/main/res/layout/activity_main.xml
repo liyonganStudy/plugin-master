@@ -11,8 +11,16 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.lya.plugindemo.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"/>
+    <Button
+        android:id="@+id/startButton"
+        android:text="打开插件Activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/installButton"
+        android:text="安装插件"
+        android:layout_below="@id/startButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </RelativeLayout>
