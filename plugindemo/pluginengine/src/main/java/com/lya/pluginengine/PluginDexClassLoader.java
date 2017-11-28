@@ -16,6 +16,11 @@
 
 package com.lya.pluginengine;
 
+import com.lya.pluginengine.utils.ReflectUtils;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import dalvik.system.DexClassLoader;
 
 /**
@@ -26,7 +31,9 @@ import dalvik.system.DexClassLoader;
  */
 
 public class PluginDexClassLoader extends DexClassLoader {
+    private static Method sLoadClassMethod;
 
+    private ClassLoader mHostClassLoader;
 //    private static final String TAG = "PluginDexClassLoader";
 //
 ////    private final ClassLoader mHostClassLoader;
@@ -47,40 +54,45 @@ public class PluginDexClassLoader extends DexClassLoader {
 //     *                           {@code null}
 //     * @param parent             the parent class loader
 //     */
-    public PluginDexClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent) {
+    public PluginDexClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent, ClassLoader hostClassLoader) {
         super(dexPath, optimizedDirectory, librarySearchPath, parent);
-//        mHostClassLoader = RePluginInternal.getAppClassLoader();
-//        initMethods(mHostClassLoader);
+        mHostClassLoader = hostClassLoader;
+        initMethods(mHostClassLoader);
     }
-//
-//    private static void initMethods(ClassLoader cl) {
-//        Class<?> clz = cl.getClass();
-//        if (sLoadClassMethod == null) {
-////            sLoadClassMethod = ReflectUtils.getMethod(clz, "loadClass", String.class, Boolean.TYPE);
-//            if (sLoadClassMethod == null) {
-//                throw new NoSuchMethodError("loadClass");
-//            }
-//        }
-//    }
-//
-//    @Override
-//    protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
-//        // 插件自己的Class。从自己开始一直到BootClassLoader，采用正常的双亲委派模型流程，读到了就直接返回
-//        Class<?> pc = null;
-//        ClassNotFoundException cnfException = null;
-//        try {
-//            pc = super.loadClass(className, resolve);
-//            if (pc != null) {
-//                // 只有开启“详细日志”才会输出，防止“刷屏”现象
-//                if (LogDebug.LOG && RePlugin.getConfig().isPrintDetailLog()) {
-//                    LogDebug.d(TAG, "loadClass: load plugin class, cn=" + className);
-//                }
-//                return pc;
-//            }
-//        } catch (ClassNotFoundException e) {
-//            // Do not throw "e" now
-//            cnfException = e;
-//        }
+
+    private static void initMethods(ClassLoader cl) {
+        Class<?> clz = cl.getClass();
+        if (sLoadClassMethod == null) {
+            sLoadClassMethod = ReflectUtils.getMethod(clz, "loadClass", String.class, Boolean.TYPE);
+            if (sLoadClassMethod == null) {
+                throw new NoSuchMethodError("loadClass");
+            }
+        }
+    }
+
+    @Override
+    protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
+        // 插件自己的Class。从自己开始一直到BootClassLoader，采用正常的双亲委派模型流程，读到了就直接返回
+        Class<?> pc = null;
+        ClassNotFoundException cnfException = null;
+        try {
+            pc = super.loadClass(className, resolve);
+            if (pc != null) {
+                // 只有开启“详细日志”才会输出，防止“刷屏”现象
+                return pc;
+            }
+        } catch (ClassNotFoundException e) {
+            // Do not throw "e" now
+            cnfException = e;
+        }
+        try {
+            return loadClassFromHost(className, resolve);
+        } catch (ClassNotFoundException e) {
+            // Do not throw "e" now
+            cnfException = e;
+        }
+        return null;
+    }
 //
 //        // 若插件里没有此类，则会从宿主ClassLoader中找，找到了则直接返回
 //        // 注意：需要读取isUseHostClassIfNotFound开关。默认为关闭的。可参见该开关的说明
@@ -100,19 +112,19 @@ public class PluginDexClassLoader extends DexClassLoader {
 //        return null;
 //    }
 //
-//    private Class<?> loadClassFromHost(String className, boolean resolve) throws ClassNotFoundException {
-//        Class<?> c;
-//        try {
-//            c = (Class<?>) sLoadClassMethod.invoke(mHostClassLoader, className, resolve);
-//            // 只有开启“详细日志”才会输出，防止“刷屏”现象
-//        } catch (IllegalAccessException e) {
-//            // Just rethrow
-//            throw new ClassNotFoundException("Calling the loadClass method failed (IllegalAccessException)", e);
-//        } catch (InvocationTargetException e) {
-//            // Just rethrow
-//            throw new ClassNotFoundException("Calling the loadClass method failed (InvocationTargetException)", e);
-//        }
-//        return c;
-//    }
+    private Class<?> loadClassFromHost(String className, boolean resolve) throws ClassNotFoundException {
+        Class<?> c;
+        try {
+            c = (Class<?>) sLoadClassMethod.invoke(mHostClassLoader, className, resolve);
+            // 只有开启“详细日志”才会输出，防止“刷屏”现象
+        } catch (IllegalAccessException e) {
+            // Just rethrow
+            throw new ClassNotFoundException("Calling the loadClass method failed (IllegalAccessException)", e);
+        } catch (InvocationTargetException e) {
+            // Just rethrow
+            throw new ClassNotFoundException("Calling the loadClass method failed (InvocationTargetException)", e);
+        }
+        return c;
+    }
 
 }

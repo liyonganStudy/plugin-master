@@ -9,6 +9,7 @@ import android.text.TextUtils;
 
 import com.lya.pluginengine.utils.LogUtils;
 import com.lya.pluginengine.utils.PatchClassLoaderUtils;
+import com.netease.clousmusic.plugininterface.IPluginEngine;
 
 import java.io.File;
 
@@ -16,7 +17,7 @@ import java.io.File;
  * Created by liyongan on 17/11/24.
  */
 
-public class PluginEngine {
+public class PluginEngine implements IPluginEngine {
     private static PluginEngine sInstance;
     private PluginManager mPluginManager;
     private PluginContainerManager mContainerManager;
@@ -60,6 +61,11 @@ public class PluginEngine {
 
     public Plugin loadAppPlugin(String plugin) {
         return mPluginManager.loadPlugin(plugin, Constants.LOAD_APP);
+    }
+
+    @Override
+    public Context getPluginContext(String plugin) {
+        return mPluginManager.getPluginContext(plugin);
     }
 
     /**

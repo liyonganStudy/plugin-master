@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/pluginengine" />
+            <option value="$PROJECT_DIR$/plugininterface" />
             <option value="$PROJECT_DIR$/testplugin" />
           </set>
         </option>

@@ -75,4 +75,12 @@ public class PluginManager {
         }
         return plugin;
     }
+
+    public PluginContext getPluginContext(String pkg) {
+        Plugin plugin = loadPlugin(pkg, Constants.LOAD_APP);
+        if (plugin == null) {
+            return null;
+        }
+        return plugin.getLoader().mPkgContext;
+    }
 }

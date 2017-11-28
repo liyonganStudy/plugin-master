@@ -8,8 +8,10 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.lya.pluginengine.utils.LogUtils;
+import com.netease.clousmusic.plugininterface.IPluginEngine;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -26,6 +28,7 @@ public class Loader {
     ClassLoader mClassLoader;
     PluginContext mPkgContext;
     private String mPluginName;
+    private ClassLoader mHostClassLoader;
 
     /**
      * layout缓存：忽略表
@@ -37,14 +40,26 @@ public class Loader {
      */
     HashMap<String, Constructor<?>> mConstructors = new HashMap<String, Constructor<?>>();
 
-    public Loader(String path, String pluginName, PluginInfo info) {
+    public Loader(String path, String pluginName, PluginInfo info, ClassLoader hostClassLoader) {
         mPath = path;
         mPluginName = pluginName;
         mInfo = info;
+        mHostClassLoader = hostClassLoader;
     }
 
     public boolean isAppLoaded() {
         return true;
+    }
+
+    public void invokeEntryCreate() {
+        try {
+            String className = mPluginName + "." + "Entry";
+            Class<?> c = mClassLoader.loadClass(className);
+            Class<?> params[] = {IPluginEngine.class};
+            Method createMethod = c.getDeclaredMethod("create", params);
+            createMethod.invoke(null, PluginEngine.getInstance());
+        } catch (Throwable e) {
+        }
     }
 
     boolean loadDex(Context context, int load) {
@@ -161,7 +176,7 @@ public class Loader {
                     parent = getClass().getClassLoader().getParent(); // TODO: 这里直接用父类加载器
                 }
                 String soDir = mPackageInfo.applicationInfo.nativeLibraryDir;
-                mClassLoader = new PluginDexClassLoader(mPath, out, soDir, parent);
+                mClassLoader = new PluginDexClassLoader(mPath, out, soDir, parent, mHostClassLoader);
                 Log.i("dex", "load " + mPath + " = " + mClassLoader);
 
                 if (mClassLoader == null) {

@@ -40,12 +40,12 @@ public class Plugin {
         }
         mInitialized = true;
         if (mLoader == null) {
-            mLoader = new Loader(mPluginInfo.getPath(), mPluginInfo.getPackageName(), mPluginInfo);
+            mLoader = new Loader(mPluginInfo.getPath(), mPluginInfo.getPackageName(), mPluginInfo, mHostClassLoader);
             if (!mLoader.loadDex(mHostContext, type)) {
                 return false;
             }
             if (type == Constants.LOAD_APP) {
-
+                mLoader.invokeEntryCreate();
             }
         }
         if (type == Constants.LOAD_APP) {
