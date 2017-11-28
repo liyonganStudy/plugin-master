@@ -1,10 +1,12 @@
 package com.lya.pluginengine;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.lya.pluginengine.utils.LogUtils;
@@ -21,6 +23,7 @@ public class PluginEngine implements IPluginEngine {
     private static PluginEngine sInstance;
     private PluginManager mPluginManager;
     private PluginContainerManager mContainerManager;
+    private PluginLibraryHelper mPluginLibraryHelper;
     private Context mContext;
 
     public static PluginEngine getInstance() {
@@ -40,6 +43,7 @@ public class PluginEngine implements IPluginEngine {
         PatchClassLoaderUtils.patch(base);
         mPluginManager = new PluginManager(base);
         mContainerManager = new PluginContainerManager();
+        mPluginLibraryHelper = new PluginLibraryHelper();
         mContext = base;
     }
 
@@ -61,11 +65,6 @@ public class PluginEngine implements IPluginEngine {
 
     public Plugin loadAppPlugin(String plugin) {
         return mPluginManager.loadPlugin(plugin, Constants.LOAD_APP);
-    }
-
-    @Override
-    public Context getPluginContext(String plugin) {
-        return mPluginManager.getPluginContext(plugin);
     }
 
     /**
@@ -96,6 +95,7 @@ public class PluginEngine implements IPluginEngine {
         if (activityInfo == null) {
             return false;
         }
+        intent.putExtra(Constants.INTENT_KEY_THEME_ID, activityInfo.theme);
         ComponentName containerComponentName = mContainerManager.loadPluginActivity(activityInfo, intent, pkg, activity);
         if (containerComponentName == null) {
             return false;
@@ -109,6 +109,15 @@ public class PluginEngine implements IPluginEngine {
         Intent intent = new Intent();
         intent.setComponent(new ComponentName(packageName, className));
         return intent;
+    }
+
+    @Override
+    public Context getPluginContext(String plugin) {
+        return mPluginManager.getPluginContext(plugin);
+    }
+
+    public void handleActivityCreateBefore(Activity activity, Bundle savedInstanceState) {
+        mPluginLibraryHelper.handleActivityCreateBefore(activity, savedInstanceState);
     }
 
 }
