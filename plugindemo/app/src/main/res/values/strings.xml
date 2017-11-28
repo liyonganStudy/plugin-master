@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Plugindemo</string>
+    <string name="title_activity_plugin_container">PluginContainerActivity</string>
 </resources>
