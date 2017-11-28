@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * Created by liyongan on 17/11/27.
@@ -13,9 +14,11 @@ import java.util.HashMap;
 public class PluginContainerManager {
 
     private HashMap<String, ActivityState> mStates = new HashMap<>();
+    private HashSet<String> mActivityContainers = new HashSet<>();
 
     public PluginContainerManager() {
         ActivityState activityState = new ActivityState();
+        mActivityContainers.add("com.lya.plugindemo.PluginContainerActivity");
         activityState.container = "com.lya.plugindemo.PluginContainerActivity";
         mStates.put(activityState.container, activityState);
     }
@@ -24,6 +27,27 @@ public class PluginContainerManager {
         String container;
         String pluginName;
         String activityName;
+    }
+
+    public boolean isContainerActivity(String activity) {
+        return mActivityContainers.contains(activity);
+    }
+
+    public Class<?> resolveActivityClass(String activity) {
+        ActivityState activityState = mStates.get(activity);
+        String pluginName = activityState.pluginName;
+        String activityName = activityState.activityName;
+        Plugin plugin = PluginEngine.getInstance().loadAppPlugin(pluginName);
+        if (plugin == null) {
+            return null;
+        }
+        ClassLoader cl = plugin.getClassLoader();
+        Class<?> c = null;
+        try {
+            c = cl.loadClass(activityName);
+        } catch (Throwable e) {
+        }
+        return c;
     }
 
     public ComponentName loadPluginActivity(ActivityInfo activityInfo, Intent intent, String packageName, String activity) {

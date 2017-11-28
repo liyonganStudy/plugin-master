@@ -30,6 +30,10 @@ public class Plugin {
         return mLoader;
     }
 
+    public ClassLoader getClassLoader() {
+        return mLoader.mClassLoader;
+    }
+
     public boolean load(int type) {
         if (mInitialized) {
 

@@ -60,9 +60,8 @@ public class HostClassLoader extends PathClassLoader {
 
     @Override
     protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
-        Class<?> c = null;
-        // TODO: 17/11/24 这里可以将load占位activity改为原本要load的插件中对应的activity
-//        c = PMF.loadClass(className, resolve);
+        Class<?> c;
+        c = PluginEngine.getInstance().loadClass(className, resolve);
         if (c != null) {
             return c;
         }

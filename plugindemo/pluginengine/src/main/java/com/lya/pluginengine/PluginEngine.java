@@ -47,6 +47,22 @@ public class PluginEngine {
     }
 
     /**
+     * 尝试先加载插件中class
+     * @param name
+     * @return
+     */
+    public Class<?> loadClass(String name, boolean resolve) {
+        if (mContainerManager.isContainerActivity(name)) {
+            return mContainerManager.resolveActivityClass(name);
+        }
+        return null;
+    }
+
+    public Plugin loadAppPlugin(String plugin) {
+        return mPluginManager.loadPlugin(plugin, Constants.LOAD_APP);
+    }
+
+    /**
      * 安装插件
      * @param path 插件下载地址
      * @return 插件相关信息

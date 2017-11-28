@@ -184,4 +184,8 @@ public class Loader {
         }
         return true;
     }
+
+    public ClassLoader getClassLoader() {
+        return mClassLoader;
+    }
 }

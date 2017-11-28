@@ -1,0 +1,2 @@
+cd testplugin
+../gradlew assemDebug
