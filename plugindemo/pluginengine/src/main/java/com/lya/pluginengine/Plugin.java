@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 
 import com.lya.pluginengine.utils.LogUtils;
+import com.netease.clousmusic.plugininterface.IPlugin;
+
+import java.io.Serializable;
 
 /**
  * Created by liyongan on 17/11/27.
@@ -14,6 +17,7 @@ public class Plugin {
     private Context mHostContext;
     private ClassLoader mHostClassLoader;
     private Loader mLoader;
+    private IPlugin mPlugin;
 
     public Plugin(PluginInfo pluginInfo) {
         mPluginInfo = pluginInfo;
@@ -54,9 +58,15 @@ public class Plugin {
                 return false;
             }
             if (type == Constants.LOAD_APP) {
-                mLoader.invokeEntryCreate();
+                mPlugin = mLoader.invokeEntryCreate();
             }
         }
         return true;
+    }
+
+    public void sendToPlugin(int code, Serializable content) {
+        if (mPlugin != null) {
+            mPlugin.sendToPlugin(code, content);
+        }
     }
 }

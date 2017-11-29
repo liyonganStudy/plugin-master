@@ -7,7 +7,7 @@ import android.content.res.Resources;
 import android.text.TextUtils;
 
 import com.lya.pluginengine.utils.LogUtils;
-import com.netease.clousmusic.plugininterface.IPluginEngine;
+import com.netease.clousmusic.plugininterface.IPlugin;
 
 import java.lang.reflect.Method;
 
@@ -32,14 +32,16 @@ public class Loader {
         mHostClassLoader = hostClassLoader;
     }
 
-    public void invokeEntryCreate() {
+    public IPlugin invokeEntryCreate() {
         try {
             String className = mPluginName + "." + "Entry";
             Class<?> c = mClassLoader.loadClass(className);
-            Class<?> params[] = {IPluginEngine.class};
-            Method createMethod = c.getDeclaredMethod("create", params);
-            createMethod.invoke(null, PluginEngine.getInstance());
+            Method createMethod = c.getDeclaredMethod("getInstance");
+            IPlugin entry = (IPlugin) createMethod.invoke(null);
+            entry.attach(PluginEngine.getInstance().getPluginHost());
+            return entry;
         } catch (Throwable e) {
+            return null;
         }
     }
 

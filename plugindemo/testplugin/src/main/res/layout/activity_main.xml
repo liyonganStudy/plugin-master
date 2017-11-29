@@ -25,8 +25,16 @@
         android:layout_height="wrap_content"/>
 
     <com.lya.testplugin.CustomTextView
+        android:id="@+id/custom"
         android:layout_below="@id/image"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/view"/>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_below="@id/custom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="同宿主通信"/>
 </RelativeLayout>

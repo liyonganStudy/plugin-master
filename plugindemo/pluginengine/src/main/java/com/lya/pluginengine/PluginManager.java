@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 import com.lya.pluginengine.utils.LogUtils;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,6 +91,14 @@ public class PluginManager {
             return null;
         }
         return plugin.resolveActivityClass(activityName);
+    }
+
+    public void sendToPlugin(String pluginName, int code, Serializable content) {
+        Plugin plugin = loadPlugin(pluginName, Constants.LOAD_APP);
+        if (plugin == null) {
+            return;
+        }
+        plugin.sendToPlugin(code, content);
     }
 
 }

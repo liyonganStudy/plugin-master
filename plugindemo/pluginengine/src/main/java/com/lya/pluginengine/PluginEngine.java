@@ -12,8 +12,10 @@ import android.text.TextUtils;
 import com.lya.pluginengine.utils.LogUtils;
 import com.lya.pluginengine.utils.PatchClassLoaderUtils;
 import com.netease.clousmusic.plugininterface.IPluginEngine;
+import com.netease.clousmusic.plugininterface.IPluginHost;
 
 import java.io.File;
+import java.io.Serializable;
 
 /**
  * Created by liyongan on 17/11/24.
@@ -25,6 +27,7 @@ public class PluginEngine implements IPluginEngine {
     private PluginContainerManager mContainerManager;
     private PluginLibraryHelper mPluginLibraryHelper;
     private Context mContext;
+    private IPluginHost mPluginHost;
 
     public static PluginEngine getInstance() {
         if (sInstance == null) {
@@ -40,16 +43,21 @@ public class PluginEngine implements IPluginEngine {
      * 宿主Application在attachBaseContext中调用
      * @param base 宿主Application
      */
-    public void attachBaseContext(Application base) {
+    public void attachBaseContext(Application base, IPluginHost pluginHost) {
         PatchClassLoaderUtils.patch(base);
         mPluginManager = new PluginManager(base);
         mContainerManager = new PluginContainerManager();
         mPluginLibraryHelper = new PluginLibraryHelper();
         mContext = base;
+        mPluginHost = pluginHost;
     }
 
     public Context getContext() {
         return mContext;
+    }
+
+    public IPluginHost getPluginHost() {
+        return mPluginHost;
     }
 
     /**
@@ -119,6 +127,10 @@ public class PluginEngine implements IPluginEngine {
 
     public void handleActivityCreateBefore(Activity activity, Bundle savedInstanceState) {
         mPluginLibraryHelper.handleActivityCreateBefore(activity, savedInstanceState);
+    }
+
+    public void sendToPlugin(String plugin, int code, Serializable content) {
+        mPluginManager.sendToPlugin(plugin, code, content);
     }
 
 }

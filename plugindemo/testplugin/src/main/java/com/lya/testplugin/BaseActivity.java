@@ -7,24 +7,35 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.netease.clousmusic.plugininterface.IPluginEngine;
 
+import java.io.Serializable;
+
 //public abstract class BaseActivity extends Activity {
 public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
-        IPluginEngine pluginEngine = Entry.sPluginEngine;
-        if (pluginEngine != null) {
+        try {
+            IPluginEngine pluginEngine = Entry.getInstance().getPluginEngine();
             newBase = pluginEngine.getPluginContext(Constants.PACKAGE_NAME);
+        } catch (Throwable throwable) {
+
         }
+
         super.attachBaseContext(newBase);
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        IPluginEngine pluginEngine = Entry.sPluginEngine;
-        if (pluginEngine != null) {
+        try {
+            IPluginEngine pluginEngine = Entry.getInstance().getPluginEngine();
             pluginEngine.handleActivityCreateBefore(this, savedInstanceState);
+        } catch (Throwable throwable) {
+
         }
         super.onCreate(savedInstanceState);
+    }
+
+    protected void handleHostMessage(int code, Serializable serializable) {
+
     }
 }
