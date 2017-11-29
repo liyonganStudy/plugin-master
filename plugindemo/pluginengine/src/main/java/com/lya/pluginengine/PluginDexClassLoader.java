@@ -43,45 +43,18 @@ public class PluginDexClassLoader extends DexClassLoader {
             pc = super.loadClass(className, resolve);
 
             // 首次加载插件activity时会加载非常多的class，原因未知。
-            LogUtils.logForClassLoader("=======PluginDexClassLoader loadClass: " + className + " result: " + pc);
+//            LogUtils.logForClassLoader("=======PluginDexClassLoader loadClass: " + className + " result: " + pc);
             if (pc != null) {
                 return pc;
             }
         } catch (ClassNotFoundException e) {
             // 和配置成是否需要，如果插件provided一个jar包，jar包在宿主内
             // 查找jar包中的类的话就需要loadClassFromHost
-//            pc = loadClassFromHost(className, resolve);
+//            pc = loadClassFromHost(className, resolve); // 不需要使用反射
             pc = mHostClassLoader.loadClass(className);
             LogUtils.logForClassLoader("=======PluginDexClassLoader loadClassFromHost: " + className + " result: " + pc);
             return pc;
         }
         return null;
     }
-
-    // 不需要使用反射
-//    private static void initMethods(ClassLoader cl) {
-//        Class<?> clz = cl.getClass();
-//        if (sLoadClassMethod == null) {
-//            sLoadClassMethod = ReflectUtils.getMethod(clz, "loadClass", String.class, Boolean.TYPE);
-//            if (sLoadClassMethod == null) {
-//                throw new NoSuchMethodError("loadClass");
-//            }
-//        }
-//    }
-//
-//    private Class<?> loadClassFromHost(String className, boolean resolve) throws ClassNotFoundException {
-//        Class<?> c;
-//        try {
-//            c = (Class<?>) sLoadClassMethod.invoke(mHostClassLoader, className, resolve);
-//            // 只有开启“详细日志”才会输出，防止“刷屏”现象
-//        } catch (IllegalAccessException e) {
-//            // Just rethrow
-//            throw new ClassNotFoundException("Calling the loadClass method failed (IllegalAccessException)", e);
-//        } catch (InvocationTargetException e) {
-//            // Just rethrow
-//            throw new ClassNotFoundException("Calling the loadClass method failed (InvocationTargetException)", e);
-//        }
-//        return c;
-//    }
-
 }

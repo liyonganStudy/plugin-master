@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewStub;
 
 import com.lya.pluginengine.utils.FilePermissionUtils;
+import com.lya.pluginengine.utils.LogUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -324,28 +325,25 @@ public class PluginContext extends ContextThemeWrapper {
             // 找类
             Class<?> c = null;
             boolean found = false;
-            do {
-                try {
-                    c = mNewClassLoader.loadClass(name);
-                    if (c == null) {
-                        // 没找到，不管
-                        break;
-                    }
-                    if (c == ViewStub.class) {
-                        // 系统特殊类，不管
-                        break;
-                    }
-                    if (c.getClassLoader() != mNewClassLoader) {
-                        // 不是插件类，不管
-                        break;
-                    }
-                    // 找到
+            try {
+                c = mNewClassLoader.loadClass(name);
+                if (c == null) {
+                    // 没找到，不管
+                    LogUtils.log("handleCreateView plugin classLoader not find ");
+                } else if (c == ViewStub.class) {
+                    LogUtils.log("handleCreateView ViewStub");
+                    // 系统特殊类，不管
+                } else if (c.getClassLoader() != mNewClassLoader) {
+                    LogUtils.log("handleCreateView class's classloader" + c.getClassLoader());
+                    // 不是插件类，不管
+                } else {
                     found = true;
-                } catch (ClassNotFoundException e) {
-                    // 失败，不管
-                    break;
+                    LogUtils.log("handleCreateView name: " + name);
                 }
-            } while (false);
+            } catch (ClassNotFoundException e) {
+                // 失败，不管
+                LogUtils.log("handleCreateView plugin classLoader not find: class  " + name);
+            }
             if (!found) {
                 // 只有开启“详细日志”才会输出，防止“刷屏”现象
                 mIgnores.add(name);
@@ -356,19 +354,16 @@ public class PluginContext extends ContextThemeWrapper {
                 construct = c.getConstructor(Context.class, AttributeSet.class);
                 mConstructors.put(name, construct);
             } catch (Exception e) {
-                InflateException ie = new InflateException(attrs.getPositionDescription() + ": Error inflating mobilesafe class " + name, e);
-                throw ie;
+                throw new InflateException(attrs.getPositionDescription() + ": Error inflating mobilesafe class " + name, e);
             }
         }
 
         // 构造
         try {
-            View v = (View) construct.newInstance(context, attrs);
             // 只有开启“详细日志”才会输出，防止“刷屏”现象
-            return v;
+            return (View) construct.newInstance(context, attrs);
         } catch (Exception e) {
-            InflateException ie = new InflateException(attrs.getPositionDescription() + ": Error inflating mobilesafe class " + name, e);
-            throw ie;
+            throw new InflateException(attrs.getPositionDescription() + ": Error inflating mobilesafe class " + name, e);
         }
     }
 
