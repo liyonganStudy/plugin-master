@@ -11,6 +11,10 @@ public class LogUtils {
         Log.d("lya", content);
     }
 
+    public static void logForClassLoader(String content) {
+        Log.d("lyaClassloader", content);
+    }
+
     public static void logStackTrace(String title) {
         StackTraceElement elements[] = Thread.currentThread().getStackTrace();
         for (StackTraceElement item : elements) {
@@ -23,5 +27,6 @@ public class LogUtils {
             int line = item.getLineNumber();
             log(cn + "." + mn + "(" + filename + ":" + line + ")" + "\n");
         }
+        log("\n\n");
     }
 }

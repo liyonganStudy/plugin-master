@@ -33,6 +33,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
             }
         });
+
+        findViewById(R.id.openActivityButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, PluginContainerActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void simulateInstallExternalPlugin() {

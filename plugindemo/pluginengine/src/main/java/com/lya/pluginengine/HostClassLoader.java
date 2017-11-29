@@ -67,7 +67,7 @@ public class HostClassLoader extends PathClassLoader {
         }
         try {
             c = mOrig.loadClass(className);
-            LogUtils.log("load class: " + className + " in hostclassloader use origin classloader");
+            LogUtils.logForClassLoader("load class: " + className + " in hostclassloader use origin classloader");
             return c;
         } catch (Throwable e) {
             e.printStackTrace();

@@ -56,9 +56,6 @@ public class PluginContext extends ContextThemeWrapper {
     private LayoutInflater mInflater;
     // 不在插件中的类，比如LinearLayout等
     private HashSet<String> mIgnores = new HashSet<>();
-    /**
-     * layout缓存：构造器表
-     */
     HashMap<String, Constructor<?>> mConstructors = new HashMap<>();
 
 //    private ContextInjector mContextInjector;

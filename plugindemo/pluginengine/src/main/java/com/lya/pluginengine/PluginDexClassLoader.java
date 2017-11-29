@@ -16,10 +16,7 @@
 
 package com.lya.pluginengine;
 
-import com.lya.pluginengine.utils.ReflectUtils;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import com.lya.pluginengine.utils.LogUtils;
 
 import dalvik.system.DexClassLoader;
 
@@ -31,100 +28,60 @@ import dalvik.system.DexClassLoader;
  */
 
 public class PluginDexClassLoader extends DexClassLoader {
-    private static Method sLoadClassMethod;
-
     private ClassLoader mHostClassLoader;
-//    private static final String TAG = "PluginDexClassLoader";
-//
-////    private final ClassLoader mHostClassLoader;
-//
-//    private static Method sLoadClassMethod;
-//
-//    /**
-//     * 初始化插件的DexClassLoader的构造函数。插件化框架会调用此函数。
-//     *
-//     * @param pi                 the plugin's info,refer to {@link PluginInfo}
-//     * @param dexPath            the list of jar/apk files containing classes and
-//     *                           resources, delimited by {@code File.pathSeparator}, which
-//     *                           defaults to {@code ":"} on Android
-//     * @param optimizedDirectory directory where optimized dex files
-//     *                           should be written; must not be {@code null}
-//     * @param librarySearchPath  the list of directories containing native
-//     *                           libraries, delimited by {@code File.pathSeparator}; may be
-//     *                           {@code null}
-//     * @param parent             the parent class loader
-//     */
+
     public PluginDexClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent, ClassLoader hostClassLoader) {
         super(dexPath, optimizedDirectory, librarySearchPath, parent);
         mHostClassLoader = hostClassLoader;
-        initMethods(mHostClassLoader);
-    }
-
-    private static void initMethods(ClassLoader cl) {
-        Class<?> clz = cl.getClass();
-        if (sLoadClassMethod == null) {
-            sLoadClassMethod = ReflectUtils.getMethod(clz, "loadClass", String.class, Boolean.TYPE);
-            if (sLoadClassMethod == null) {
-                throw new NoSuchMethodError("loadClass");
-            }
-        }
     }
 
     @Override
     protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
         // 插件自己的Class。从自己开始一直到BootClassLoader，采用正常的双亲委派模型流程，读到了就直接返回
-        Class<?> pc = null;
-        ClassNotFoundException cnfException = null;
+        Class<?> pc;
         try {
             pc = super.loadClass(className, resolve);
+
+            // 首次加载插件activity时会加载非常多的class，原因未知。
+            LogUtils.logForClassLoader("=======PluginDexClassLoader loadClass: " + className + " result: " + pc);
             if (pc != null) {
-                // 只有开启“详细日志”才会输出，防止“刷屏”现象
                 return pc;
             }
         } catch (ClassNotFoundException e) {
-            // Do not throw "e" now
-            cnfException = e;
-        }
-        try {
-            return loadClassFromHost(className, resolve);
-        } catch (ClassNotFoundException e) {
-            // Do not throw "e" now
-            cnfException = e;
+            // 和配置成是否需要，如果插件provided一个jar包，jar包在宿主内
+            // 查找jar包中的类的话就需要loadClassFromHost
+//            pc = loadClassFromHost(className, resolve);
+            pc = mHostClassLoader.loadClass(className);
+            LogUtils.logForClassLoader("=======PluginDexClassLoader loadClassFromHost: " + className + " result: " + pc);
+            return pc;
         }
         return null;
     }
-//
-//        // 若插件里没有此类，则会从宿主ClassLoader中找，找到了则直接返回
-//        // 注意：需要读取isUseHostClassIfNotFound开关。默认为关闭的。可参见该开关的说明
-//        if (RePlugin.getConfig().isUseHostClassIfNotFound()) {
-//            try {
-//                return loadClassFromHost(className, resolve);
-//            } catch (ClassNotFoundException e) {
-//                // Do not throw "e" now
-//                cnfException = e;
+
+    // 不需要使用反射
+//    private static void initMethods(ClassLoader cl) {
+//        Class<?> clz = cl.getClass();
+//        if (sLoadClassMethod == null) {
+//            sLoadClassMethod = ReflectUtils.getMethod(clz, "loadClass", String.class, Boolean.TYPE);
+//            if (sLoadClassMethod == null) {
+//                throw new NoSuchMethodError("loadClass");
 //            }
 //        }
-//
-//        // At this point we can throw the previous exception
-//        if (cnfException != null) {
-//            throw cnfException;
-//        }
-//        return null;
 //    }
 //
-    private Class<?> loadClassFromHost(String className, boolean resolve) throws ClassNotFoundException {
-        Class<?> c;
-        try {
-            c = (Class<?>) sLoadClassMethod.invoke(mHostClassLoader, className, resolve);
-            // 只有开启“详细日志”才会输出，防止“刷屏”现象
-        } catch (IllegalAccessException e) {
-            // Just rethrow
-            throw new ClassNotFoundException("Calling the loadClass method failed (IllegalAccessException)", e);
-        } catch (InvocationTargetException e) {
-            // Just rethrow
-            throw new ClassNotFoundException("Calling the loadClass method failed (InvocationTargetException)", e);
-        }
-        return c;
-    }
+//    private Class<?> loadClassFromHost(String className, boolean resolve) throws ClassNotFoundException {
+//        Class<?> c;
+//        try {
+//            c = (Class<?>) sLoadClassMethod.invoke(mHostClassLoader, className, resolve);
+//            // 只有开启“详细日志”才会输出，防止“刷屏”现象
+//        } catch (IllegalAccessException e) {
+//            // Just rethrow
+//            throw new ClassNotFoundException("Calling the loadClass method failed (IllegalAccessException)", e);
+//        } catch (InvocationTargetException e) {
+//            // Just rethrow
+//            throw new ClassNotFoundException("Calling the loadClass method failed (InvocationTargetException)", e);
+//        }
+//        return c;
+//    }
 
 }

@@ -3,6 +3,8 @@ package com.lya.pluginengine;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 
+import com.lya.pluginengine.utils.LogUtils;
+
 /**
  * Created by liyongan on 17/11/27.
  */
@@ -39,6 +41,7 @@ public class Plugin {
         Class<?> c = null;
         try {
             c = cl.loadClass(activityName);
+            LogUtils.logForClassLoader("=======PluginDexClassLoader resolveActivityClass: " + activityName + " result: " + c);
         } catch (Throwable e) {
         }
         return c;
