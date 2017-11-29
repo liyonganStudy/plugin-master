@@ -32,6 +32,7 @@ public class PluginEngine implements IPluginEngine {
         }
         return sInstance;
     }
+
     private PluginEngine() {
     }
 
@@ -63,8 +64,8 @@ public class PluginEngine implements IPluginEngine {
         return null;
     }
 
-    public Plugin loadAppPlugin(String plugin) {
-        return mPluginManager.loadPlugin(plugin, Constants.LOAD_APP);
+    public Class<?> resolveActivityClass(String plugin, String activityName) {
+        return mPluginManager.resolveActivityClass(plugin, activityName);
     }
 
     /**

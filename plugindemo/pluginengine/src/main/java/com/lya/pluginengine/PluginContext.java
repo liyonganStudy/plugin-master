@@ -37,6 +37,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * @author RePlugin Team
@@ -44,22 +46,20 @@ import java.lang.reflect.Constructor;
 public class PluginContext extends ContextThemeWrapper {
 
     private final ClassLoader mNewClassLoader;
-
     private final Resources mNewResources;
-
     private final String mPlugin;
-
     private final Loader mLoader;
-
     private final Object mSync = new Object();
-
     private File mFilesDir;
-
     private File mCacheDir;
-
     private File mDatabasesDir;
-
     private LayoutInflater mInflater;
+    // 不在插件中的类，比如LinearLayout等
+    private HashSet<String> mIgnores = new HashSet<>();
+    /**
+     * layout缓存：构造器表
+     */
+    HashMap<String, Constructor<?>> mConstructors = new HashMap<>();
 
 //    private ContextInjector mContextInjector;
 
@@ -314,13 +314,13 @@ public class PluginContext extends ContextThemeWrapper {
 
     private final View handleCreateView(String name, Context context, AttributeSet attrs) {
         // 忽略表命中，返回
-        if (mLoader.mIgnores.contains(name)) {
+        if (mIgnores.contains(name)) {
             // 只有开启“详细日志”才会输出，防止“刷屏”现象
             return null;
         }
 
         // 构造器缓存
-        Constructor<?> construct = mLoader.mConstructors.get(name);
+        Constructor<?> construct = mConstructors.get(name);
 
         // 缓存失败
         if (construct == null) {
@@ -351,13 +351,13 @@ public class PluginContext extends ContextThemeWrapper {
             } while (false);
             if (!found) {
                 // 只有开启“详细日志”才会输出，防止“刷屏”现象
-                mLoader.mIgnores.add(name);
+                mIgnores.add(name);
                 return null;
             }
             // 找构造器
             try {
                 construct = c.getConstructor(Context.class, AttributeSet.class);
-                mLoader.mConstructors.put(name, construct);
+                mConstructors.put(name, construct);
             } catch (Exception e) {
                 InflateException ie = new InflateException(attrs.getPositionDescription() + ": Error inflating mobilesafe class " + name, e);
                 throw ie;
@@ -435,11 +435,11 @@ public class PluginContext extends ContextThemeWrapper {
     @Override
     public String getPackageCodePath() {
         // 获取插件Apk的路径
-        return mLoader.mPath;
+        return mLoader.getPath();
     }
 
     @Override
     public ApplicationInfo getApplicationInfo() {
-        return mLoader.mComponents.getApplication();
+        return mLoader.getComponents().getApplication();
     }
 }

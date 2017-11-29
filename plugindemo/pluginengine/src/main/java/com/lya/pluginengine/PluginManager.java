@@ -50,22 +50,7 @@ public class PluginManager {
         mPlugins.put(pluginInfo.getPackageName(), plugin);
     }
 
-    public ActivityInfo getActivityInfo(String pkg, String activity) {
-        Plugin plugin = loadPlugin(pkg, Constants.LOAD_APP);
-        if (plugin == null) {
-            return null;
-        }
-        ActivityInfo activityInfo = null;
-        if (!TextUtils.isEmpty(activity)) {
-            activityInfo = plugin.getLoader().mComponents.getActivity(activity);
-        } else {
-            // activity 为空时，根据 Intent 匹配
-//            activityInfo = IntentMatcherHelper.getActivityInfo(mContext, plugin, intent);
-        }
-        return activityInfo;
-    }
-
-    public Plugin loadPlugin(String pluginName, int type) {
+    private Plugin loadPlugin(String pluginName, int type) {
         Plugin plugin = mPlugins.get(pluginName);
         if (plugin == null) {
             return null;
@@ -76,11 +61,35 @@ public class PluginManager {
         return plugin;
     }
 
+    public ActivityInfo getActivityInfo(String pkg, String activity) {
+        Plugin plugin = loadPlugin(pkg, Constants.LOAD_APP);
+        if (plugin == null) {
+            return null;
+        }
+        ActivityInfo activityInfo = null;
+        if (!TextUtils.isEmpty(activity)) {
+            activityInfo = plugin.getActivityInfo(activity);
+        } else {
+            // activity 为空时，根据 Intent 匹配
+//            activityInfo = IntentMatcherHelper.getActivityInfo(mContext, plugin, intent);
+        }
+        return activityInfo;
+    }
+
     public PluginContext getPluginContext(String pkg) {
         Plugin plugin = loadPlugin(pkg, Constants.LOAD_APP);
         if (plugin == null) {
             return null;
         }
-        return plugin.getLoader().mPkgContext;
+        return plugin.getPluginContext();
     }
+
+    public Class<?> resolveActivityClass(String pluginName, String activityName) {
+        Plugin plugin = loadPlugin(pluginName, Constants.LOAD_APP);
+        if (plugin == null) {
+            return null;
+        }
+        return plugin.resolveActivityClass(activityName);
+    }
+
 }

@@ -37,17 +37,7 @@ public class PluginContainerManager {
         ActivityState activityState = mStates.get(activity);
         String pluginName = activityState.pluginName;
         String activityName = activityState.activityName;
-        Plugin plugin = PluginEngine.getInstance().loadAppPlugin(pluginName);
-        if (plugin == null) {
-            return null;
-        }
-        ClassLoader cl = plugin.getClassLoader();
-        Class<?> c = null;
-        try {
-            c = cl.loadClass(activityName);
-        } catch (Throwable e) {
-        }
-        return c;
+        return PluginEngine.getInstance().resolveActivityClass(pluginName, activityName);
     }
 
     public ComponentName loadPluginActivity(ActivityInfo activityInfo, Intent intent, String packageName, String activity) {
