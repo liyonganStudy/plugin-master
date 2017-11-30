@@ -16,7 +16,8 @@ public class MainActivity extends BaseActivity {
         } catch (Throwable throwable) {
 
         }
-        setContentView(R.layout.activity_main);
+//        setContentView(R.layout.activity_main);
+        setContentView(R.layout.fragment_main);
         findViewById(R.id.button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -32,6 +32,10 @@ public class Plugin {
         mHostContext = context;
     }
 
+    public ClassLoader getPluginClassLoader() {
+        return mLoader.getClassLoader();
+    }
+
     public PluginContext getPluginContext() {
         return mLoader.getPkgContext();
     }

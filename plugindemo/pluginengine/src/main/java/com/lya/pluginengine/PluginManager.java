@@ -85,6 +85,14 @@ public class PluginManager {
         return plugin.getPluginContext();
     }
 
+    public ClassLoader getPluginClassLoader(String pkg) {
+        Plugin plugin = loadPlugin(pkg, Constants.LOAD_APP);
+        if (plugin == null) {
+            return null;
+        }
+        return plugin.getPluginClassLoader();
+    }
+
     public Class<?> resolveActivityClass(String pluginName, String activityName) {
         Plugin plugin = loadPlugin(pluginName, Constants.LOAD_APP);
         if (plugin == null) {

@@ -125,6 +125,10 @@ public class PluginEngine implements IPluginEngine {
         return mPluginManager.getPluginContext(plugin);
     }
 
+    public ClassLoader getPluginClassLoader(String plugin) {
+        return mPluginManager.getPluginClassLoader(plugin);
+    }
+
     public void handleActivityCreateBefore(Activity activity, Bundle savedInstanceState) {
         mPluginLibraryHelper.handleActivityCreateBefore(activity, savedInstanceState);
     }

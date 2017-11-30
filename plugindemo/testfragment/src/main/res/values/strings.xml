@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Testfragment</string>
+    <string name="desc">我是插件工程中的TextView</string>
+    <string name="view">我是插件工程中的自定义view</string>
+</resources>

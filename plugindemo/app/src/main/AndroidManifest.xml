@@ -27,6 +27,8 @@
             android:label="@string/title_activity_plugin_container"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity android:name=".InHostActivity">
+        </activity>
     </application>
 
 </manifest>

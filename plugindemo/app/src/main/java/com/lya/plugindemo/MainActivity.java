@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.Toast;
 
 import com.lya.pluginengine.PluginEngine;
-import com.lya.pluginengine.PluginInfo;
 import com.lya.pluginengine.utils.FileUtils;
 
 import java.io.File;
@@ -24,42 +24,41 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.installButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                simulateInstallExternalPlugin();
+                simulateInstallExternalPlugin("demo3.apk");
+                simulateInstallExternalPlugin("fragment.apk");
+                Toast.makeText(MainActivity.this, "安装demo3.apk和fragment.apk", Toast.LENGTH_SHORT).show();
             }
         });
 
         findViewById(R.id.startButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = PluginEngine.getInstance().getBasicIntent("com.lya.testplugin", "com.lya.testplugin.MainActivity");
+                PluginEngine.getInstance().startActivity(MainActivity.this, intent);
             }
         });
 
         findViewById(R.id.openActivityButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, PluginContainerActivity.class);
+                Intent intent = new Intent(MainActivity.this, InHostActivity.class);
                 startActivity(intent);
             }
         });
     }
 
-    private void simulateInstallExternalPlugin() {
-        String demo3Apk= "demo3.apk";
+    private void simulateInstallExternalPlugin(String apkName) {
+//        String demo3Apk= "demo3.apk";
 
         // 文件是否已经存在？直接删除重来
-        String pluginFilePath = getFilesDir().getAbsolutePath() + File.separator + demo3Apk;
+        String pluginFilePath = getFilesDir().getAbsolutePath() + File.separator + apkName;
         File pluginFile = new File(pluginFilePath);
         if (pluginFile.exists()) {
             FileUtils.deleteQuietly(pluginFile);
         }
-        copyAssetsFileToAppFiles(demo3Apk, demo3Apk);
-        PluginInfo info = null;
+        copyAssetsFileToAppFiles(apkName, apkName);
         if (pluginFile.exists()) {
-            info = PluginEngine.getInstance().install(pluginFilePath);
-        }
-        if (info != null) {
-            Intent intent = PluginEngine.getInstance().getBasicIntent(info.getPackageName(), "com.lya.testplugin.MainActivity");
-            PluginEngine.getInstance().startActivity(MainActivity.this, intent);
+            PluginEngine.getInstance().install(pluginFilePath);
         }
     }
 

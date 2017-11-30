@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:text="@string/desc"/>
+
+    <com.netease.clousmusic.testfragment.CustomTextView
+        android:id="@+id/custom"
+        android:layout_below="@id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/view"/>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_below="@id/custom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="同宿主通信"/>
+</RelativeLayout>

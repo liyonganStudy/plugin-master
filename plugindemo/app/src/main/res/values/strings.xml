@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Plugindemo</string>
     <string name="title_activity_plugin_container">PluginContainerActivity</string>
-    <string name="activity">打开宿主中Activity</string>
+    <string name="activity">打开宿主中Activity,Activit使用的Fragment来自插件</string>
 </resources>

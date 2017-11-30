@@ -1,15 +1,15 @@
-package com.lya.testplugin;
+package com.netease.clousmusic.testfragment;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 
 import com.netease.clousmusic.plugininterface.IPluginEngine;
 
 import java.io.Serializable;
 
-//public abstract class BaseActivity extends Activity {
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends Activity {
+//public abstract class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context newBase) {
