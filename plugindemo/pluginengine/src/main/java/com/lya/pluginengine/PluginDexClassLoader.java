@@ -37,8 +37,10 @@ public class PluginDexClassLoader extends DexClassLoader {
 
     @Override
     protected Class<?> loadClass(String className, boolean resolve) throws ClassNotFoundException {
-        // 插件自己的Class。从自己开始一直到BootClassLoader，采用正常的双亲委派模型流程，读到了就直接返回
         Class<?> pc;
+        if (className.equals("android.support.v4.app.Fragment")) {
+            return mHostClassLoader.loadClass(className);
+        }
         try {
             pc = super.loadClass(className, resolve);
 

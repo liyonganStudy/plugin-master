@@ -13,8 +13,8 @@ public class InHostActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_in_host);
 
-        installFragment("com.netease.clousmusic.testfragment");
-//        installFragment("com.lya.testplugin");
+//        installFragment("com.netease.clousmusic.testfragment");// 这个插件中fragment是provided，会自动找宿主中framgnet
+        installFragment("com.lya.testplugin"); // 这个插件中framgnet插件中也有，需要在PluginDexClassLoader中特别处理
     }
 
     private void installFragment(String packageName) {
